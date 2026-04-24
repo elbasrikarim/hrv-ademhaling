@@ -9,27 +9,30 @@
   <title>HRV Ademhaling</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e1a; color: #fff; height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; overflow: hidden; padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px); padding-top: max(env(safe-area-inset-top), 40px); padding-bottom: max(env(safe-area-inset-bottom), 30px); }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e1a; color: #fff; height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; overflow: hidden; padding: 40px 20px 30px; }
+    @supports (padding-top: env(safe-area-inset-top)) {
+      body { padding-top: max(env(safe-area-inset-top), 40px); padding-bottom: max(env(safe-area-inset-bottom), 30px); }
+    }
     .header { text-align: center; z-index: 10; }
     .header h1 { font-size: 22px; font-weight: 300; letter-spacing: 2px; color: #a0b4d0; text-transform: uppercase; }
     .header p { font-size: 13px; color: #4a6080; margin-top: 4px; letter-spacing: 1px; }
     .circle-container { position: relative; display: flex; align-items: center; justify-content: center; flex: 1; }
     .glow-ring { position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(100,180,255,0.04) 0%, transparent 70%); }
     .ring-outer { position: absolute; width: 250px; height: 250px; border-radius: 50%; border: 1px solid rgba(100,180,255,0.15); }
-    .breath-circle { width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4ab3ff, #1a5fa0 60%, #0a2a50); box-shadow: 0 0 40px rgba(74,179,255,0.3), 0 0 80px rgba(74,179,255,0.1), inset 0 0 30px rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; transition: transform 5.5s cubic-bezier(0.45, 0.05, 0.55, 0.95), box-shadow 5.5s ease; transform: scale(1); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+    .breath-circle { width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4ab3ff, #1a5fa0 60%, #0a2a50); box-shadow: 0 0 40px rgba(74,179,255,0.3), 0 0 80px rgba(74,179,255,0.1), inset 0 0 30px rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; transition: transform 5.5s cubic-bezier(0.45, 0.05, 0.55, 0.95), box-shadow 5.5s ease; transform: scale(1); }
     .breath-circle.inhale { transform: scale(1.35); box-shadow: 0 0 60px rgba(74,179,255,0.5), 0 0 120px rgba(74,179,255,0.2), inset 0 0 40px rgba(255,255,255,0.15); }
     .breath-circle.exhale { transform: scale(1); box-shadow: 0 0 30px rgba(74,179,255,0.2), 0 0 60px rgba(74,179,255,0.05), inset 0 0 20px rgba(255,255,255,0.05); }
-    .phase-label { font-size: 15px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.9); text-align: center; }
-    .phase-seconds { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; letter-spacing: 1px; }
+    .phase-label { font-size: 15px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.9); text-align: center; pointer-events: none; }
+    .phase-seconds { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; letter-spacing: 1px; pointer-events: none; }
     .timer-display { font-size: 36px; font-weight: 200; letter-spacing: 3px; color: #a0c8f0; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
     .progress-bar-bg { width: 100%; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-bottom: 20px; }
     .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #1a5fa0, #4ab3ff); border-radius: 2px; transition: width 1s linear; width: 0%; }
     .breath-count { font-size: 13px; color: #4a6080; letter-spacing: 1px; margin-bottom: 20px; }
-    .start-btn { width: 100%; max-width: 320px; padding: 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, #1a5fa0, #4ab3ff); color: #fff; font-size: 17px; font-weight: 500; letter-spacing: 1px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s, transform 0.1s; box-shadow: 0 4px 20px rgba(74,179,255,0.3); }
-    .start-btn:active { opacity: 0.85; transform: scale(0.98); }
+    .start-btn { width: 100%; max-width: 320px; padding: 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, #1a5fa0, #4ab3ff); color: #fff; font-size: 17px; font-weight: 500; letter-spacing: 1px; cursor: pointer; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(74,179,255,0.3); -webkit-appearance: none; appearance: none; }
+    .start-btn:active { opacity: 0.8; }
     .start-btn.stop { background: linear-gradient(135deg, #3a2a4a, #6a3a7a); box-shadow: 0 4px 20px rgba(150,80,200,0.3); }
     .duration-select { width: 100%; max-width: 320px; display: flex; gap: 8px; margin-bottom: 14px; }
-    .dur-btn { flex: 1; padding: 10px 0; border: 1px solid rgba(74,179,255,0.25); border-radius: 10px; background: rgba(74,179,255,0.05); color: #5a8ab0; font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all 0.2s; }
+    .dur-btn { flex: 1; padding: 10px 0; border: 1px solid rgba(74,179,255,0.25); border-radius: 10px; background: rgba(74,179,255,0.05); color: #5a8ab0; font-size: 14px; cursor: pointer; transition: all 0.2s; -webkit-appearance: none; appearance: none; }
     .dur-btn.active { background: rgba(74,179,255,0.18); border-color: rgba(74,179,255,0.6); color: #a0d4ff; font-weight: 600; }
     .complete-overlay { position: fixed; inset: 0; background: rgba(10,14,26,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.8s ease; padding: 40px; text-align: center; }
     .complete-overlay.show { opacity: 1; pointer-events: all; }
@@ -65,20 +68,19 @@
     <button class="start-btn" onclick="resetSession()">Opnieuw</button>
   </div>
   <script>
-    let audioCtx=null;
+    var audioCtx=null;
     function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-    function playChime(type){try{const ctx=getAudioCtx();const osc=ctx.createOscillator();const g=ctx.createGain();osc.connect(g);g.connect(ctx.destination);if(type==='inhale'){osc.frequency.setValueAtTime(528,ctx.currentTime);osc.frequency.linearRampToValueAtTime(660,ctx.currentTime+0.3);}else{osc.frequency.setValueAtTime(528,ctx.currentTime);osc.frequency.linearRampToValueAtTime(396,ctx.currentTime+0.3);}osc.type='sine';g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.18,ctx.currentTime+0.05);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.9);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.9);}catch(e){}}
-    const PHASE=5500;let totalDur=5*60*1000,running=false,phase='inhale',phaseTimer=null,countTimer=null,elapsed=0,breathCount=0,startTime=null;
-    const bc=document.getElementById('breathCircle'),pl=document.getElementById('phaseLabel'),ps=document.getElementById('phaseSeconds'),td=document.getElementById('timerDisplay'),pb=document.getElementById('progressBar'),bce=document.getElementById('breathCount'),sb=document.getElementById('startBtn'),co=document.getElementById('completeOverlay'),ds=document.getElementById('durationSelect');
-    function selectDuration(m){if(running)return;totalDur=m*60*1000;document.querySelectorAll('.dur-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.min)===m));td.textContent=fmt(totalDur);bce.textContent='Kies duur en druk op Start';pb.style.width='0%';}
-    function fmt(ms){const s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+(s%60+'').padStart(2,'0');}
-    function toggleSession(){running?stopSession():startSession();}
+    function playChime(type){try{var ctx=getAudioCtx();if(ctx.state==='suspended')ctx.resume();var osc=ctx.createOscillator();var g=ctx.createGain();osc.connect(g);g.connect(ctx.destination);if(type==='inhale'){osc.frequency.setValueAtTime(528,ctx.currentTime);osc.frequency.linearRampToValueAtTime(660,ctx.currentTime+0.3);}else{osc.frequency.setValueAtTime(528,ctx.currentTime);osc.frequency.linearRampToValueAtTime(396,ctx.currentTime+0.3);}osc.type='sine';g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.18,ctx.currentTime+0.05);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.9);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.9);}catch(e){console.log('audio error',e);}}
+    var PHASE=5500,totalDur=5*60*1000,running=false,phase='inhale',phaseTimer=null,countTimer=null,elapsed=0,breathCount=0,startTime=null;
+    var bc=document.getElementById('breathCircle'),pl=document.getElementById('phaseLabel'),ps=document.getElementById('phaseSeconds'),td=document.getElementById('timerDisplay'),pb=document.getElementById('progressBar'),bce=document.getElementById('breathCount'),sb=document.getElementById('startBtn'),co=document.getElementById('completeOverlay'),ds=document.getElementById('durationSelect');
+    function selectDuration(m){if(running)return;totalDur=m*60*1000;var btns=document.querySelectorAll('.dur-btn');for(var i=0;i<btns.length;i++){btns[i].classList.toggle('active',parseInt(btns[i].dataset.min)===m);}td.textContent=fmt(totalDur);bce.textContent='Kies duur en druk op Start';pb.style.width='0%';}
+    function fmt(ms){var s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60);}
+    function toggleSession(){if(running){stopSession();}else{startSession();}}
     function startSession(){running=true;elapsed=0;breathCount=0;startTime=Date.now();phase='exhale';sb.textContent='Stop sessie';sb.classList.add('stop');ds.style.opacity='0.3';ds.style.pointerEvents='none';nextPhase();startCountdown();}
     function stopSession(){running=false;clearTimeout(phaseTimer);clearInterval(countTimer);bc.className='breath-circle';pl.textContent='Start';ps.textContent='5.5s';td.textContent=fmt(totalDur);bce.textContent='Kies duur en druk op Start';pb.style.width='0%';sb.textContent='Begin sessie';sb.classList.remove('stop');ds.style.opacity='';ds.style.pointerEvents='';}
     function resetSession(){co.classList.remove('show');stopSession();}
     function nextPhase(){if(!running)return;phase=phase==='inhale'?'exhale':'inhale';if(phase==='inhale'){breathCount++;bc.className='breath-circle inhale';pl.textContent='Inademen';ps.textContent='5.5 seconden';playChime('inhale');}else{bc.className='breath-circle exhale';pl.textContent='Uitademen';ps.textContent='5.5 seconden';playChime('exhale');}bce.textContent=breathCount+' ademcycli voltooid';phaseTimer=setTimeout(nextPhase,PHASE);}
-    function startCountdown(){countTimer=setInterval(()=>{if(!running)return;elapsed=Date.now()-startTime;const rem=Math.max(0,totalDur-elapsed);td.textContent=fmt(rem);pb.style.width=((elapsed/totalDur)*100).toFixed(1)+'%';if(rem<=0){clearInterval(countTimer);clearTimeout(phaseTimer);running=false;bc.className='breath-circle';pl.textContent='Klaar';ps.textContent='✓';sb.textContent='Begin sessie';sb.classList.remove('stop');ds.style.opacity='';ds.style.pointerEvents='';setTimeout(()=>co.classList.add('show'),800);}},500);}
-    document.addEventListener('touchend',e=>e.preventDefault(),{passive:false});
+    function startCountdown(){countTimer=setInterval(function(){if(!running)return;elapsed=Date.now()-startTime;var rem=Math.max(0,totalDur-elapsed);td.textContent=fmt(rem);pb.style.width=((elapsed/totalDur)*100).toFixed(1)+'%';if(rem<=0){clearInterval(countTimer);clearTimeout(phaseTimer);running=false;bc.className='breath-circle';pl.textContent='Klaar';ps.textContent='✓';sb.textContent='Begin sessie';sb.classList.remove('stop');ds.style.opacity='';ds.style.pointerEvents='';setTimeout(function(){co.classList.add('show');},800);}},500);}
   </script>
 </body>
 </html>
